@@ -37,10 +37,32 @@ namespace TDDhw_TestGroup
         {
             //arrage
             var _Product = oProduct();
+            var _Group = new GroupSumService();
+
             List<int> expected = new List<int> { 6, 15, 24, 21 };
 
             //act
-            List<int> actual = GroupSum(3, _Product.Select(o => o.Cost).ToList());
+            List<int> actual = _Group.GroupSum(3, _Product.Select(o => o.Cost).ToList());
+
+            //assert
+            CollectionAssert.AreEqual(expected, actual);
+        }
+
+    
+        /// <summary>
+        /// Revenue四筆一組的總和
+        /// </summary>
+        [TestMethod]
+        public void Test_GroupSum4_ByRevenue()
+        {
+            //arrage
+            var _Product = oProduct();
+            var _Group = new GroupSumService();
+
+            List<int> expected = new List<int> { 50, 66, 60 };
+
+            //act
+            List<int> actual = _Group.GroupSum(4, _Product.Select(o => o.Revenue).ToList());
 
             //assert
             CollectionAssert.AreEqual(expected, actual);
@@ -54,39 +76,17 @@ namespace TDDhw_TestGroup
         {
             //arrage
             var _Product = oProduct();
+            var _Group = new GroupSumService();
+
             List<int> expected = new List<int> { 115, 140, 31 };
 
             //act
-            List<int> actual = GroupSum(5, _Product.Select(o => o.SellPrice).ToList());
+            List<int> actual = _Group.GroupSum(5, _Product.Select(o => o.SellPrice).ToList());
 
             //assert
             CollectionAssert.AreEqual(expected, actual);
         }
 
-        /// <summary>
-        /// Revenue四筆一組的總和
-        /// </summary>
-        [TestMethod]
-        public void Test_GroupSum4_ByRevenue()
-        {
-            //arrage
-            var _Product = oProduct();
-            List<int> expected = new List<int> { 50, 66, 60 };
-
-            //act
-            List<int> actual = GroupSum(4, _Product.Select(o => o.Revenue).ToList());
-
-            //assert
-            CollectionAssert.AreEqual(expected, actual);
-        }
-
-        internal class Product
-        {
-            public int Id { get; set; }
-            public int Cost { get; set; }
-            public int Revenue { get; set; }
-            public int SellPrice { get; set; }
-        }
 
         /// <summary>
         /// 小實作測試
@@ -107,13 +107,15 @@ namespace TDDhw_TestGroup
                 new Drinks() { Quantity=7 },
 
             };
+            var _Group = new GroupSumService();
+
             List<int> expected_By3 = new List<int> { 6, 15, 7 };
             List<int> expected_By4 = new List<int> { 10, 18 };
 
 
             //act 測試取三筆及四筆
-            List<int> actual_By3 = GroupSum(3, _drink.Select(o => o.Quantity).ToList());
-            List<int> actual_By4 = GroupSum(4, _drink.Select(o => o.Quantity).ToList());
+            List<int> actual_By3 = _Group.GroupSum(3, _drink.Select(o => o.Quantity).ToList());
+            List<int> actual_By4 = _Group.GroupSum(4, _drink.Select(o => o.Quantity).ToList());
 
             //assert
             CollectionAssert.AreEqual(expected_By3, actual_By3);
@@ -123,21 +125,33 @@ namespace TDDhw_TestGroup
         internal class Drinks
         {
             public int Quantity { get; set; }
-            
+
         }
 
-        private List<int> GroupSum(int divided, List<int> product)
+
+    }
+    public class Product
+    {
+        public int Id { get; set; }
+        public int Cost { get; set; }
+        public int Revenue { get; set; }
+        public int SellPrice { get; set; }
+    }
+    public class GroupSumService
+    {
+        public List<int> GroupSum(int divided, List<int> product)
         {
             //divided - 所需數量組合  ,  product - 該產品項目產品總和
             //初始
             List<int> list = new List<int>();
-            int value = 0;
-            //將產品列舉
-            while (value < product.Count())
+            int group = 0;
+            //將產品列舉數量
+            while (group < product.Count())
             {
                 //依據條件擷取取得總和
-                list.Add(product.Skip(value).Take(divided).Sum());
-                value += divided;
+                list.Add(product.Skip(group).Take(divided).Sum());
+                //將所需數量群組化
+                group += divided;
             }
             return list;
         }
